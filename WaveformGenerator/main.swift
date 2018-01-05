@@ -18,21 +18,24 @@ do {
   let amplifiedData = analyzer.amplify(desampledData, by: 500)
   print("Amplification done...")
   
-  let image = WaveformGenerator().generateWaveformFromAudioData(amplifiedData, metadata: metadata)
-  print("Image generation done...")
-  
-  let targetURL = URL(fileURLWithPath: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop").path,
-                      isDirectory: true).appendingPathComponent("waveform_\(metadata.filename).bmp")
-  
-  FileManager.default.createFile(atPath: targetURL.path,
-                                 contents: nil,
-                                 attributes: nil)
-  
-  try image!.tiffRepresentation?.write(to: targetURL)
-  print("File saved to: \(targetURL.path)")
-  
-  
-  print("Sucessfully finished! 🎈🌟")
+  if let image = WaveformGenerator().generateWaveformFromAudioData(amplifiedData, metadata: metadata) {
+    print("Image generation done...")
+    
+    let targetURL = URL(fileURLWithPath: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop").path,
+                        isDirectory: true).appendingPathComponent("waveform_\(metadata.filename).bmp")
+    
+    FileManager.default.createFile(atPath: targetURL.path,
+                                   contents: nil,
+                                   attributes: nil)
+    
+    try image.tiffRepresentation?.write(to: targetURL)
+    print("File saved to: \(targetURL.path)")
+    
+    
+    print("Sucessfully finished! 🎈🌟")
+  } else {
+   print("Image generation failed.")
+  }
 } catch {
   print("Caught an error:\n")
   print(error.localizedDescription)

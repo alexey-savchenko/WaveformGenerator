@@ -11,58 +11,8 @@ import Cocoa
 
 class WaveformGenerator {
   
-  public func drawItems(bounds: CGRect, block: (CGRect, CGContext) -> () ) -> NSImage? {
-    var outputImage: NSImage? = nil
-    let insetSize = CGSize(width: -20, height: -20)
-    let insetBounds = bounds.insetBy(dx: insetSize.width, dy: insetSize.height)
-    let colorSpace = CGColorSpaceCreateDeviceRGB()
-    let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
-    let bitmapContext = CGContext(
-      data: nil,
-      width: Int(insetBounds.size.width),
-      height: Int(insetBounds.size.height),
-      bitsPerComponent: 8,
-      bytesPerRow: 0,
-      space: colorSpace,
-      bitmapInfo: bitmapInfo.rawValue)
-    
-    if let context = bitmapContext {
-      context.concatenate(CGAffineTransform(translationX: -insetSize.width, y: -insetSize.height))
-      context.concatenate(CGAffineTransform(translationX: -bounds.origin.x, y: -bounds.origin.y))
-      
-      block(bounds, context)
-      
-      if let image = context.makeImage() {
-        outputImage = NSImage(cgImage: image, size: insetBounds.size)
-      }
-    }
-    
-    return outputImage
-  }
-  
-  // example drawing function
-  func drawSquare(bounds: CGRect, context: CGContext) {
-    
-    let path = CGPath(rect: bounds, transform: nil)
-    
-    context.addPath(path)
-    context.setStrokeColor(NSColor.red.cgColor)
-    context.setLineWidth(20)
-    context.setLineJoin(.round)
-    context.setLineCap(.round)
-    
-    let dashArray:[CGFloat] = [16, 32]
-    context.setLineDash(phase: 0, lengths: dashArray)
-    context.replacePathWithStrokedPath()
-    
-    context.setFillColor(NSColor.red.cgColor)
-    context.fillPath()
-    
-  }
-  
   func generateWaveformFromAudioData(_ audioData: [Float],
                                      metadata: AudioMetadata) -> NSImage? {
-    
     
     let baseDataCount = audioData.count
     
@@ -94,14 +44,14 @@ class WaveformGenerator {
       for dataPoint in audioData {
         
         let upperbarRect = CGRect(x: offset,
-                                   y: workingRect.midY + CGFloat(dataPoint),
-                                   width: CGFloat(1.0),
-                                   height: CGFloat(-dataPoint))
+                                  y: workingRect.midY + CGFloat(dataPoint),
+                                  width: CGFloat(1.0),
+                                  height: CGFloat(-dataPoint))
         
         let bottombarRect = CGRect(x: offset,
-                             y: workingRect.midY - CGFloat(dataPoint),
-                             width: CGFloat(1.0),
-                             height: CGFloat(dataPoint))
+                                   y: workingRect.midY - CGFloat(dataPoint),
+                                   width: CGFloat(1.0),
+                                   height: CGFloat(dataPoint))
         
         let bottombarPath = CGPath(rect: bottombarRect, transform: nil)
         let upperbarPath = CGPath(rect: upperbarRect, transform: nil)
@@ -113,28 +63,43 @@ class WaveformGenerator {
       
       context.setFillColor(NSColor.red.cgColor)
       context.fillPath()
+    
+      //Draw text
+      context.setTextDrawingMode(.fillStroke)
+      
+      //Draw file name
+      context.textPosition = CGPoint(x: 50, y: workingRect.height - 50)
+      let filenameAttrString = NSAttributedString(string: "Filename: \(metadata.filename)", attributes: [NSAttributedStringKey.font: NSFont.systemFont(ofSize: 40),
+                                                                   NSAttributedStringKey.foregroundColor: NSColor.black])
+      
+      let filenameLine = CTLineCreateWithAttributedString(filenameAttrString)
+      CTLineDraw(filenameLine, context)
+      
+      //Draw author name
+      context.textPosition = CGPoint(x: 50, y: workingRect.height - 92)
+      let authorAttrString = NSAttributedString(string: "Author: \(metadata.author)", attributes: [NSAttributedStringKey.font: NSFont.systemFont(ofSize: 40),
+                                                                                          NSAttributedStringKey.foregroundColor: NSColor.black])
+      
+      let authorLine = CTLineCreateWithAttributedString(authorAttrString)
+      CTLineDraw(authorLine, context)
+      
+      //Draw duration
+      context.textPosition = CGPoint(x: 50, y: workingRect.height - 132)
+      let durationAttrString = NSAttributedString(string: "Duration: \(metadata.duration) min.", attributes: [NSAttributedStringKey.font: NSFont.systemFont(ofSize: 40),
+                                                                                        NSAttributedStringKey.foregroundColor: NSColor.black])
+      
+      let durationLine = CTLineCreateWithAttributedString(durationAttrString)
+      CTLineDraw(durationLine, context)
+
       
       if let image = context.makeImage() {
-        outputImage = NSImage(cgImage: image, size: workingRect.size)
+        outputImage = NSImage(cgImage: image,
+                              size: workingRect.size)
       }
       
     }
     
     return outputImage
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-
-
-    
     
   }
   

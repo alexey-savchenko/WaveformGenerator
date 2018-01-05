@@ -13,13 +13,13 @@ class AudioMetadataExtractor {
   
   func extractMetadataOfFileAt(_ fileURL: URL) -> AudioMetadata {
     
-    let filename = fileURL.lastPathComponent
+    let filename = fileURL.lastPathComponent.components(separatedBy: " ").joined(separator: "_")
     
     let item = AVPlayerItem(url: fileURL)
     
     let durInSeconds = CMTimeGetSeconds(item.asset.duration)
     
-    let duration = "\(durInSeconds / 60)".substring(to: "\(durInSeconds / 60)".index("\(durInSeconds / 60)".startIndex, offsetBy: 4)).appending(" m.")
+    let duration = "\(durInSeconds / 60)".substring(to: "\(durInSeconds / 60)".index("\(durInSeconds / 60)".startIndex, offsetBy: 4))
     
     let artistname: String
     
