@@ -60,14 +60,6 @@ class WaveformGenerator {
     
   }
   
-  func drawWaveform(bounds: CGRect, context: CGContext) {
-    
-    
-    
-
-    
-  }
-  
   func generateWaveformFromAudioData(_ audioData: [Float],
                                      metadata: AudioMetadata) -> NSImage? {
     
@@ -93,7 +85,12 @@ class WaveformGenerator {
     var offset: CGFloat = 0
     
     if let context = bitmapContext {
-
+      
+      let bgPath = CGPath(rect: workingRect, transform: nil)
+      context.addPath(bgPath)
+      context.setFillColor(NSColor.white.cgColor)
+      context.fillPath()
+      
       for dataPoint in audioData {
         
         let upperbarRect = CGRect(x: offset,
@@ -111,6 +108,7 @@ class WaveformGenerator {
         context.addPath(bottombarPath)
         context.addPath(upperbarPath)
         offset += 1
+        
       }
       
       context.setFillColor(NSColor.red.cgColor)

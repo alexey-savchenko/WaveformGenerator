@@ -4,33 +4,37 @@ import Foundation
 
 let fileURL = URL(fileURLWithPath: CommandLine.arguments[1])
 
-print("Got:\n\(fileURL)\n")
-
 do {
   let analyzer = AudioAnalyzer()
   let audioData = try analyzer.analyzeAudioFile(url: fileURL)
-  print("Got \(audioData.count) points of data.")
+  print("Got \(audioData.count) points of data. Yay! ")
   
   let metadata = AudioMetadataExtractor().extractMetadataOfFileAt(fileURL)
+  print("Metadata extraction done...")
   
-  let desample = analyzer.resample(audioData, to: 4096)
-  let amp = analyzer.amplify(desample, by: 500)
+  let desampledData = analyzer.resample(audioData, to: 4096)
+  print("Downsampling done...")
   
-  let image = WaveformGenerator().generateWaveformFromAudioData(amp, metadata: metadata)
+  let amplifiedData = analyzer.amplify(desampledData, by: 500)
+  print("Amplification done...")
   
-//  print(image)
-  let targetURL = URL(fileURLWithPath: "/Users/iosUser/Desktop",
-                      isDirectory: true).appendingPathComponent("waveform_\(fileURL.lastPathComponent).png")
+  let image = WaveformGenerator().generateWaveformFromAudioData(amplifiedData, metadata: metadata)
+  print("Image generation done...")
+  
+  let targetURL = URL(fileURLWithPath: FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Desktop").path,
+                      isDirectory: true).appendingPathComponent("waveform_\(metadata.filename).bmp")
   
   FileManager.default.createFile(atPath: targetURL.path,
                                  contents: nil,
                                  attributes: nil)
   
   try image!.tiffRepresentation?.write(to: targetURL)
+  print("File saved to: \(targetURL.path)")
   
-  print("Sucessfully finished! 🎈")
   
+  print("Sucessfully finished! 🎈🌟")
 } catch {
+  print("Caught an error:\n")
   print(error.localizedDescription)
 }
 
