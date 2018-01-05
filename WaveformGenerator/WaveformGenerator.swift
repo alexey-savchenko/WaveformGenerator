@@ -18,7 +18,7 @@ class WaveformGenerator {
     
     let baseRect = CGRect(x: 0, y: 0, width: baseDataCount, height: lrintf(audioData.max()!) * 2)
     
-    let workingRect = baseRect.applying(CGAffineTransform(scaleX: 1.1, y: 1.1))
+    let workingRect = baseRect.applying(CGAffineTransform(scaleX: 1, y: 1.1))
     
     var outputImage: NSImage? = nil
     let colorSpace = CGColorSpaceCreateDeviceRGB()
@@ -63,34 +63,34 @@ class WaveformGenerator {
       
       context.setFillColor(NSColor.red.cgColor)
       context.fillPath()
-    
+      
       //Draw text
       context.setTextDrawingMode(.fillStroke)
       
+      let textAttributes: [NSAttributedStringKey: Any] = [NSAttributedStringKey.font: NSFont.systemFont(ofSize: 40),
+                                                          NSAttributedStringKey.foregroundColor: NSColor.black]
+      
       //Draw file name
       context.textPosition = CGPoint(x: 50, y: workingRect.height - 50)
-      let filenameAttrString = NSAttributedString(string: "Filename: \(metadata.filename)", attributes: [NSAttributedStringKey.font: NSFont.systemFont(ofSize: 40),
-                                                                   NSAttributedStringKey.foregroundColor: NSColor.black])
+      let filenameAttrString = NSAttributedString(string: "Filename: \(metadata.filename)", attributes: textAttributes)
       
       let filenameLine = CTLineCreateWithAttributedString(filenameAttrString)
       CTLineDraw(filenameLine, context)
       
       //Draw author name
       context.textPosition = CGPoint(x: 50, y: workingRect.height - 92)
-      let authorAttrString = NSAttributedString(string: "Author: \(metadata.author)", attributes: [NSAttributedStringKey.font: NSFont.systemFont(ofSize: 40),
-                                                                                          NSAttributedStringKey.foregroundColor: NSColor.black])
+      let authorAttrString = NSAttributedString(string: "Author: \(metadata.author)", attributes: textAttributes)
       
       let authorLine = CTLineCreateWithAttributedString(authorAttrString)
       CTLineDraw(authorLine, context)
       
       //Draw duration
       context.textPosition = CGPoint(x: 50, y: workingRect.height - 132)
-      let durationAttrString = NSAttributedString(string: "Duration: \(metadata.duration) min.", attributes: [NSAttributedStringKey.font: NSFont.systemFont(ofSize: 40),
-                                                                                        NSAttributedStringKey.foregroundColor: NSColor.black])
+      let durationAttrString = NSAttributedString(string: "Duration: \(metadata.duration) min.", attributes: textAttributes)
       
       let durationLine = CTLineCreateWithAttributedString(durationAttrString)
       CTLineDraw(durationLine, context)
-
+      
       
       if let image = context.makeImage() {
         outputImage = NSImage(cgImage: image,
