@@ -74,7 +74,7 @@ class WaveformGenerator {
     
     let baseDataCount = audioData.count
     
-    let baseRect = CGRect(x: 0, y: 0, width: baseDataCount, height: lrintf(audioData.max()!))
+    let baseRect = CGRect(x: 0, y: 0, width: baseDataCount, height: lrintf(audioData.max()!) * 2)
     
     let workingRect = baseRect.applying(CGAffineTransform(scaleX: 1.1, y: 1.1))
     
@@ -96,14 +96,20 @@ class WaveformGenerator {
 
       for dataPoint in audioData {
         
-        let barRect = CGRect(x: offset,
+        let upperbarRect = CGRect(x: offset,
+                                   y: workingRect.midY + CGFloat(dataPoint),
+                                   width: CGFloat(1.0),
+                                   height: CGFloat(-dataPoint))
+        
+        let bottombarRect = CGRect(x: offset,
                              y: workingRect.midY - CGFloat(dataPoint),
                              width: CGFloat(1.0),
                              height: CGFloat(dataPoint))
         
-        let barPath = CGPath(rect: barRect, transform: nil)
-        
-        context.addPath(barPath)
+        let bottombarPath = CGPath(rect: bottombarRect, transform: nil)
+        let upperbarPath = CGPath(rect: upperbarRect, transform: nil)
+        context.addPath(bottombarPath)
+        context.addPath(upperbarPath)
         offset += 1
       }
       
@@ -135,3 +141,4 @@ class WaveformGenerator {
   }
   
 }
+
