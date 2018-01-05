@@ -13,11 +13,22 @@ do {
   
   let metadata = AudioMetadataExtractor().extractMetadataOfFileAt(fileURL)
   
-  let image = WaveformGenerator().generateWaveformFromAudioData(audioData, metadata: metadata)
+  let desample = analyzer.resample(audioData, to: 4096)
+  let amp = analyzer.amplify(desample, by: 500)
   
-  let targetURL = URL(fileURLWithPath: "/Users/DreDD/Desktop", isDirectory: true).appendingPathComponent("img.png")
+  let image = WaveformGenerator().generateWaveformFromAudioData(amp, metadata: metadata)
   
-  try image.tiffRepresentation?.write(to: targetURL)
+//  print(image)
+  let targetURL = URL(fileURLWithPath: "/Users/iosUser/Desktop",
+                      isDirectory: true).appendingPathComponent("waveform_\(fileURL.lastPathComponent).png")
+  
+  FileManager.default.createFile(atPath: targetURL.path,
+                                 contents: nil,
+                                 attributes: nil)
+  
+  try image!.tiffRepresentation?.write(to: targetURL)
+  
+  print("Sucessfully finished! 🎈")
   
 } catch {
   print(error.localizedDescription)

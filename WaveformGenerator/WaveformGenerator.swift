@@ -60,13 +60,77 @@ class WaveformGenerator {
     
   }
   
+  func drawWaveform(bounds: CGRect, context: CGContext) {
+    
+    
+    
+
+    
+  }
+  
   func generateWaveformFromAudioData(_ audioData: [Float],
-                                     metadata: AudioMetadata) -> NSImage {
+                                     metadata: AudioMetadata) -> NSImage? {
     
-    let bounds = CGRect(x: 0, y: 0, width: 128, height: 128)
-    let image = drawItems(bounds: bounds, block: drawSquare)
     
-    return image!
+    let baseDataCount = audioData.count
+    
+    let baseRect = CGRect(x: 0, y: 0, width: baseDataCount, height: lrintf(audioData.max()!))
+    
+    let workingRect = baseRect.applying(CGAffineTransform(scaleX: 1.1, y: 1.1))
+    
+    var outputImage: NSImage? = nil
+    let colorSpace = CGColorSpaceCreateDeviceRGB()
+    let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedLast.rawValue)
+    let bitmapContext = CGContext(
+      data: nil,
+      width: Int(workingRect.size.width),
+      height: Int(workingRect.size.height),
+      bitsPerComponent: 8,
+      bytesPerRow: 0,
+      space: colorSpace,
+      bitmapInfo: bitmapInfo.rawValue)
+    
+    var offset: CGFloat = 0
+    
+    if let context = bitmapContext {
+
+      for dataPoint in audioData {
+        
+        let barRect = CGRect(x: offset,
+                             y: workingRect.midY - CGFloat(dataPoint),
+                             width: CGFloat(1.0),
+                             height: CGFloat(dataPoint))
+        
+        let barPath = CGPath(rect: barRect, transform: nil)
+        
+        context.addPath(barPath)
+        offset += 1
+      }
+      
+      context.setFillColor(NSColor.red.cgColor)
+      context.fillPath()
+      
+      if let image = context.makeImage() {
+        outputImage = NSImage(cgImage: image, size: workingRect.size)
+      }
+      
+    }
+    
+    return outputImage
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+
+    
     
   }
   
