@@ -22,7 +22,7 @@ To use this script download WaveformGeneratorBin file from this repo.
 Than navigate to file with Terminal and execute:
 
 ```bash
-./WaveformGenerator <PATH_TO_FILE> <AMPLIFICATION_FACTOR>
+./WaveformGeneratorBin <PATH_TO_FILE> <AMPLIFICATION_FACTOR>
 ```
 
 Your PATH_TO_FILE should not contain whitespaces.
